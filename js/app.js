@@ -57,8 +57,8 @@ function starPercentage (){
     }
 }
 
-//this function will count the number of vote star
-function voteNum(){
+//this function will count the number of stars
+function starNum(){
     for (let index = 0; index < star.children.length; index++) {
         let vote = star.children[index].children[0].className
         if(vote === "fa fa-star"){
@@ -96,7 +96,7 @@ function clickedCard (event){
                 time = time/1000;
                 time = time.toString();
                 time = time.substring(0,4);
-                voteNum();
+                starNum();
                 winnerNotifcation();
             }
         }, 300)
@@ -163,7 +163,7 @@ function shuffle(array) {
     return array;
 }
 
-// show this pop-up when the player solve all the cards
+// show this pop-up when the player win the game
 function winnerNotifcation() {
     if (confirm(`Congratulations you have won with ${step} moves and it took you ${time} seconds and you got ${starSelected} out of 3 stars. To play the game again press ok`)) {
         clickedRestartButton();
