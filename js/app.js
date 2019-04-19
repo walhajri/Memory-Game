@@ -33,7 +33,6 @@ starSelected = 0;
 //////////////////////////////
 // Below are all the click listener 
 /////////////////////////////
-star.addEventListener("click",vote);
 deck.addEventListener("click",clickedCard);
 restartButton.addEventListener("click",clickedRestartButton);
 
@@ -42,15 +41,19 @@ restartButton.addEventListener("click",clickedRestartButton);
 // Below are all the function 
 /////////////////////////////
 
-// this functin will count the number of votes 
-function vote (event){
-    if(event.target.className === 'fa fa-star-o'){
-        event.target.classList.remove("fa-star-o");
-        event.target.classList.add("fa-star");
+// this functin will count star Percentage 
+function starPercentage (){
+    if(step == 20){
+        star.children[0].children[0].classList.remove("fa-star");
+        star.children[0].children[0].classList.add("fa-star-o");
     }
-    else if(event.target.className === 'fa fa-star'){
-        event.target.classList.remove("fa-star");
-        event.target.classList.add("fa-star-o");
+    else if(step == 30){
+        star.children[1].children[0].classList.remove("fa-star");
+        star.children[1].children[0].classList.add("fa-star-o");
+    }
+    else if (step > 50){
+        star.children[2].children[0].classList.remove("fa-star");
+        star.children[2].children[0].classList.add("fa-star-o");
     }
 }
 
@@ -58,7 +61,7 @@ function vote (event){
 function voteNum(){
     for (let index = 0; index < star.children.length; index++) {
         let vote = star.children[index].children[0].className
-        if(vote === 'fa fa-star'){
+        if(vote === "fa fa-star"){
             starSelected++;
         }
         
@@ -66,6 +69,7 @@ function voteNum(){
 }
 // this function will handle the event when the cards is clicked
 function clickedCard (event){
+    starPercentage();
     if(step === 0){
         t0 = performance.now() + performance.timing.navigationStart;
     }
@@ -92,6 +96,7 @@ function clickedCard (event){
                 time = time/1000;
                 time = time.toString();
                 time = time.substring(0,4);
+                voteNum();
                 winnerNotifcation();
             }
         }, 300)
@@ -125,8 +130,8 @@ function clickedRestartButton (){
         cardsList[outterIndex].classList.remove("match","show","open");
     }
     for (let index = 0; index < star.children.length; index++) {
-        star.children[index].children[0].classList.remove("fa-star")
-        star.children[index].children[0].classList.add("fa-star-o")
+        star.children[index].children[0].classList.remove("fa-star-o")
+        star.children[index].children[0].classList.add("fa-star")
     }
     step = 0;
     matchCard = 0;
@@ -160,7 +165,7 @@ function shuffle(array) {
 
 // show this pop-up when the player solve all the cards
 function winnerNotifcation() {
-    if (confirm(`Congratulations you have won with ${step} moves and it took you ${time} seconds. To play the game again press ok`)) {
+    if (confirm(`Congratulations you have won with ${step} moves and it took you ${time} seconds and you got ${starSelected} out of 3 stars. To play the game again press ok`)) {
         clickedRestartButton();
       } else {
         // nothing
