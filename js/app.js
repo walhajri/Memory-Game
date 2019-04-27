@@ -24,17 +24,23 @@ let matchCard = 0;
 let t0 = 0;
 let t1 = 0;
 let time = 0;
+let displaytime = document.getElementById("time");
 // star count
 let star = document.getElementsByClassName('stars');
 star = star[0]
 starSelected = 0;
-
+// winner modal
+let modal = document.getElementById('winnerMessage');
+let palyAgain = document.getElementById('restartbtn');
+//flag to know the number if card is clicked or not
+let gameStarted = 0;
 
 //////////////////////////////
 // Below are all the click listener 
 /////////////////////////////
-deck.addEventListener("click",clickedCard);
-restartButton.addEventListener("click",clickedRestartButton);
+deck.addEventListener("click", clickedCard);
+restartButton.addEventListener("click", clickedRestartButton);
+palyAgain.addEventListener("click", clickedRestartButton);
 
 
 //////////////////////////////
@@ -42,92 +48,118 @@ restartButton.addEventListener("click",clickedRestartButton);
 /////////////////////////////
 
 // this functin will count star Percentage 
-function starPercentage (){
-    if(step == 20){
+function starPercentage() {
+    if (step == 20) {
         star.children[0].children[0].classList.remove("fa-star");
         star.children[0].children[0].classList.add("fa-star-o");
     }
-    else if(step == 30){
+    else if (step == 30) {
         star.children[1].children[0].classList.remove("fa-star");
         star.children[1].children[0].classList.add("fa-star-o");
     }
-    else if (step > 50){
+    else if (step > 50) {
         star.children[2].children[0].classList.remove("fa-star");
         star.children[2].children[0].classList.add("fa-star-o");
     }
 }
 
 //this function will count the number of stars
-function starNum(){
+function starNum() {
     for (let index = 0; index < star.children.length; index++) {
         let vote = star.children[index].children[0].className
-        if(vote === "fa fa-star"){
+        if (vote === "fa fa-star") {
             starSelected++;
         }
-        
+
     }
 }
 // this function will handle the event when the cards is clicked
-function clickedCard (event){
+function clickedCard(event) {
     starPercentage();
-    if(step === 0){
+    if (step === 1) {
         t0 = performance.now() + performance.timing.navigationStart;
+        calcTime();
     }
-    step ++; 
+    step++;
     countMoves();
     let currentCard = event.target;
     let secondCard = currentCard.children[0].className;
     openedCard.push(currentCard);
     let firstCard = openedCard[0].children[0].className;
-    if(openedCard.length == 1){
-        currentCard.classList.add("show","open");
+    if (openedCard.length == 1) {
+        currentCard.classList.add("show", "open");
     }
-    if(openedCard.length === 2 && (firstCard == secondCard)){
+    if (openedCard.length === 2 && (firstCard == secondCard)) {
 
-        currentCard.classList.add("show","open");
-        openedCard[0].classList.add("match","show","open");
-        openedCard[1].classList.add("match","show","open");
+        currentCard.classList.add("show", "open");
+        openedCard[0].classList.add("match", "show", "open");
+        openedCard[1].classList.add("match", "show", "open");
         openedCard = [];
-        matchCard ++;
-        setTimeout(()=>{
-            if(matchCard === 8){
-                t1 = performance.now() + performance.timing.navigationStart;
-                time = t1 - t0;
-                time = time/1000;
-                time = time.toString();
-                time = time.substring(0,4);
+        matchCard++;
+        setTimeout(() => {
+            if (matchCard === 8) {
+                calcTime();
                 starNum();
                 winnerNotifcation();
             }
         }, 300)
     }
-    if(openedCard.length === 2 && (firstCard != secondCard)){
+    if (openedCard.length === 2 && (firstCard != secondCard)) {
         openedCard[0].classList.add("wrong");
         openedCard[1].classList.add("wrong");
-        setTimeout(()=>{
-            openedCard[0].classList.remove("wrong","open","show");
-            openedCard[1].classList.remove("wrong"); 
+        setTimeout(() => {
+            openedCard[0].classList.remove("wrong", "open", "show");
+            openedCard[1].classList.remove("wrong");
             openedCard = [];
-        },500)
+        }, 500)
 
     }
 }
 
 // this method count the number of moves
-function countMoves(){
+function countMoves() {
     move[0].innerHTML = step
 
 }
+function calcTime() {
+    if (step === 0) {
+        displaytime.innerHTML = "0 seconds"
+    }else {
+        t1 = performance.now() + performance.timing.navigationStart;
+        time = t1 - t0;
+        time = time / 1000;
+        minute = time / 60
+        if (time < 60) {
+            time = time.toString().split(".")[0];
+            displaytime.innerHTML = time + " seconds";
+        }
+        else {
+            minuteString = minute.toString();
+            minute = minuteString.split(".")[0];
+            second = minuteString.split(".")[1]
+            second = "0." + second;
+            time = second * 60;
+            time = time.toString();
+            time = time.split(".")[0];
+            minute = minute.toString();
+            minute = minute.substring(0, 2);
+            displaytime.innerHTML = minute + ":" + time + " minutes";
+        }
+        setTimeout(() => {
+            calcTime();
+        }, 1000);
+    }
+}
 
 // When the restart button is clicked this function will shuffle the list
-function clickedRestartButton (){
+function clickedRestartButton() {
     iconList = shuffle(iconList);
     for (let outterIndex = 0; outterIndex < iconList.length; outterIndex++) {
         for (let innerIndex = 0; innerIndex < iconList.length; innerIndex++) {
             cardsList[outterIndex].children[0].classList.remove(iconList[innerIndex])
         }
         cardsList[outterIndex].children[0].classList.add(iconList[outterIndex])
-        cardsList[outterIndex].classList.remove("match","show","open");
+        cardsList[outterIndex].classList.remove("match", "show", "open");
     }
     for (let index = 0; index < star.children.length; index++) {
         star.children[index].children[0].classList.remove("fa-star-o")
@@ -136,11 +168,14 @@ function clickedRestartButton (){
     step = 0;
     matchCard = 0;
     starSelected = 0;
+    openedCard = []
+    calcTime();
     countMoves();
+    $('#exampleModalCenter').modal('hide')
 }
 
 // get the cards icones class name and stored it in an iconList array
-function getCardsProperty(){
+function getCardsProperty() {
     iconList = []
     for (let index = 0; index < cardsList.length; index++) {
         let old = cardsList[index].children[0].className;
@@ -165,9 +200,6 @@ function shuffle(array) {
 
 // show this pop-up when the player win the game
 function winnerNotifcation() {
-    if (confirm(`Congratulations you have won with ${step} moves and it took you ${time} seconds and you got ${starSelected} out of 3 stars. To play the game again press ok`)) {
-        clickedRestartButton();
-      } else {
-        // nothing
-      }  
+    $('#exampleModalCenter').modal('show')
+    modal.innerHTML = `Congratulations you have won with ${step} moves and it took you ${time} seconds and you got ${starSelected} out of 3 stars. To play the game again press restart`
 }
